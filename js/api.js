@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return await mockProcessing(text, settings, signal);
             }
 
-            // Otherwise, call Gemini API
-            return await callGeminiAPI(text, settings, signal);
+            // Otherwise, call Gemini API (defined in formatter.js)
+            return await window.callGeminiAPI(text, settings, signal);
         } catch (error) {
             if (error.name === 'AbortError') {
                 throw error; // Re-throw abort errors

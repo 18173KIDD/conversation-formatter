@@ -1,5 +1,5 @@
 // Gemini APIを使用した会話フォーマッター
-async function formatConversation(text, settings, signal) {
+async function callGeminiAPI(text, settings, signal) { // 関数名を変更
     try {
         const prompt = document.getElementById("prompt-text").value;
         const input = `${prompt}\n\n【会話内容】\n${text}`;
@@ -55,4 +55,4 @@ async function formatConversation(text, settings, signal) {
 }
 
 // グローバルに公開
-window.formatConversation = formatConversation;
+window.callGeminiAPI = callGeminiAPI; // 公開する名前も変更
