@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>会話フォーマッター</title>
+    <title>AI会話アシスタント</title>
     <meta name="description" content="会話テキストを整理して読みやすくフォーマットするツール。フィラーワードの削除、時間表示の追加、話題のグループ化などの機能を提供します。">
     <meta name="keywords" content="会話フォーマッター, 文字起こし, テキスト整形, フィラーワード削除, 会話整理">
     <meta name="author" content="会話フォーマッター">
@@ -29,7 +29,7 @@
 <body>
     <header>
         <div class="container">
-            <h1><i class="fas fa-comments"></i> 会話フォーマッター</h1>
+            <h1><i class="fas fa-comments"></i> AI会話アシスタント</h1>
             <p>会話テキストを整理して読みやすくフォーマットするツール</p>
         </div>
     </header>
@@ -37,7 +37,7 @@
     <main class="container">
         <div class="tabs">
             <button class="tab-btn active" data-tab="input">入力</button>
-            <button class="tab-btn" data-tab="prompt">条件</button>
+            <button class="tab-btn" data-tab="prompt">指示</button>
             <button class="tab-btn" data-tab="output">出力</button>
         </div>
 
@@ -90,26 +90,36 @@
 
         <div class="tab-content" id="prompt-tab">
             <div class="card">
-                <h2>条件（プロンプト）</h2>
+                <h2>指示（プロンプト）</h2>
                 <div class="prompt-container">
-                    <textarea id="prompt-text" placeholder="条件を入力してください...">【条件】
-- 内容は一切変更しないでください
-- 「えー」「あー」などのフィラーワードは削除してください
-- 大まかに10分おきの時間表示を目安として入れてください（例：「00:00頃～」）
+                    <textarea id="prompt-text" placeholder="条件を入力してください...">【標準形式】
+出力形式: Markdown
+
+# 条件
+- フィラーワードは削除してください
+- 10分おきに時間表示を入れてください
 - 話題の自然な流れを優先し、関連する内容はひとまとまりにしてください
 - 各トピックには内容を端的に表すタイトルをつけてください
-- 話題が変わったと判断できる箇所で区切りを入れてください
 - 話者を明確に区別してください（例：A: 〇〇、B: 〇〇）
-- 注意　必ず会話内容は全て漏れなく含めてください
-- 10分の区切りをまたいでも、同じ話題は連続して記載してください</textarea>
+- 会話内容は全て漏れなく含めてください
+
+# フォーマット例
+## [トピックタイトル]
+### 00:00頃～
+- A: 発言内容
+- B: 発言内容
+
+## [次のトピック]
+### 00:10頃～
+- A: 発言内容
+- B: 発言内容</textarea>
                     
                     <div class="prompt-templates">
                         <h3>テンプレート</h3>
-                        <button class="template-btn" data-template="standard">標準</button>
-                        <button class="template-btn" data-template="detailed">詳細</button>
-                        <button class="template-btn" data-template="simple">シンプル</button>
-                        <button class="template-btn" data-template="business">ビジネス</button>
-                        <button class="template-btn" data-template="academic">学術</button>
+                        <button class="template-btn" data-template="standard">標準フォーマット</button>
+                        <button class="template-btn" data-template="minutes">議事録作成</button>
+                        <button class="template-btn" data-template="summary">会話要約</button>
+                        <button class="template-btn" data-template="importance">重要点抽出</button>
                     </div>
                     
                     <div class="prompt-actions">
@@ -168,7 +178,7 @@
 
         <div class="action-bar">
             <button id="format-btn" class="btn primary">
-                <i class="fas fa-magic"></i> フォーマット実行
+                <i class="fas fa-magic"></i> 整理開始
             </button>
         </div>
     </main>
