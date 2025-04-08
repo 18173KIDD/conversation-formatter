@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会話フォーマッター</title>
+    <meta name="description" content="会話テキストを整理して読みやすくフォーマットするツール。フィラーワードの削除、時間表示の追加、話題のグループ化などの機能を提供します。">
+    <meta name="keywords" content="会話フォーマッター, 文字起こし, テキスト整形, フィラーワード削除, 会話整理">
+    <meta name="author" content="会話フォーマッター">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="会話フォーマッター">
+    <meta property="og:description" content="会話テキストを整理して読みやすくフォーマットするツール">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://18173kidd.github.io/conversation-formatter-improved/">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6fa5">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-comments"></i> 会話フォーマッター</h1>
+            <p>会話テキストを整理して読みやすくフォーマットするツール</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="input">入力</button>
+            <button class="tab-btn" data-tab="prompt">条件</button>
+            <button class="tab-btn" data-tab="output">出力</button>
+        </div>
+
+        <div class="tab-content active" id="input-tab">
+            <div class="card">
+                <h2>入力</h2>
+                <button id="settings-toggle" class="settings-toggle" title="設定">
+                    <i class="fas fa-cog"></i>
+                </button>
+                
+                <div class="input-type-selector">
+                    <label>
+                        <input type="radio" name="input-type" value="text" checked> テキスト入力
+                    </label>
+                    <label>
+                        <input type="radio" name="input-type" value="file"> 音声文字起こし (外部ツール)
+                    </label>
+                </div>
+                
+                <div id="text-input-container">
+                    <textarea id="conversation-input" placeholder="ここに会話テキストを入力してください..."></textarea>
+                    <button id="clear-input-btn" class="btn secondary btn-small" title="入力をクリア">
+                        <i class="fas fa-times"></i> クリア
+                    </button>
+                </div>
+                
+                <div id="file-input-container" style="display: none;">
+                    <h4>Google AI Studio を使用した音声文字起こし手順</h4>
+                    <p>このツールでは直接音声ファイルを扱えませんが、以下の手順でGoogle AI Studio（無料）を使用して文字起こしを行い、その結果を上のテキスト入力欄に貼り付けて利用できます。</p>
+                    <ol>
+                        <li><strong>アクセスとログイン:</strong> <a href="https://ai.google.dev/aistudio?hl=ja" target="_blank">Google AI Studio</a> にアクセスし、Googleアカウントでログインします。</li>
+                        <li><strong>新規プロンプト作成:</strong> 「Create new」または「Create Prompt」をクリックします。</li>
+                        <li><strong>モデル選択:</strong> モデル選択メニューから `Gemini 1.5 Pro` や `Gemini 2.0 Flash` などの音声対応モデルを選択します。</li>
+                        <li><strong>音声ファイルアップロード:</strong> プロンプト入力エリア付近の「＋」や「Insert」メニューから「File」や「Upload File」を選び、音声ファイル（MP3, WAV, FLAC等）をアップロードします。（ファイルサイズが大きい場合は分割やGoogle Drive経由を検討）</li>
+                        <li><strong>プロンプト入力:</strong> テキスト欄に「この音声ファイルを文字起こししてください。」などと入力します。</li>
+                        <li><strong>実行:</strong> 「Run」ボタンをクリックします。</li>
+                        <li><strong>結果確認とコピー:</strong> 生成された文字起こし結果を確認し、コピーします。</li>
+                        <li><strong>貼り付け:</strong> このツールの「テキスト入力」タブに戻り、上のテキストエリアに結果を貼り付けて「フォーマット実行」をクリックします。</li>
+                    </ol>
+                    <p><small>※Google AI StudioのUIや機能は変更される可能性があります。</small></p>
+                </div>
+                
+                
+                <div class="start-time-container">
+                    <label for="start-time">会話開始時間（オプション）:</label>
+                    <input type="time" id="start-time" value="00:00">
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="prompt-tab">
+            <div class="card">
+                <h2>条件（プロンプト）</h2>
+                <div class="prompt-container">
+                    <textarea id="prompt-text" placeholder="条件を入力してください...">【条件】
+- 内容は一切変更しないでください
+- 「えー」「あー」などのフィラーワードは削除してください
+- 大まかに10分おきの時間表示を目安として入れてください（例：「00:00頃～」）
+- 話題の自然な流れを優先し、関連する内容はひとまとまりにしてください
+- 各トピックには内容を端的に表すタイトルをつけてください
+- 話題が変わったと判断できる箇所で区切りを入れてください
+- 話者を明確に区別してください（例：A: 〇〇、B: 〇〇）
+- 注意　必ず会話内容は全て漏れなく含めてください
+- 10分の区切りをまたいでも、同じ話題は連続して記載してください</textarea>
+                    
+                    <div class="prompt-templates">
+                        <h3>テンプレート</h3>
+                        <button class="template-btn" data-template="standard">標準</button>
+                        <button class="template-btn" data-template="detailed">詳細</button>
+                        <button class="template-btn" data-template="simple">シンプル</button>
+                        <button class="template-btn" data-template="business">ビジネス</button>
+                        <button class="template-btn" data-template="academic">学術</button>
+                    </div>
+                    
+                    <div class="prompt-actions">
+                        <button id="apply-prompt" class="btn primary">条件を適用</button>
+                        <button id="reset-prompt" class="btn secondary">デフォルトに戻す</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="output-tab">
+            <div class="card">
+                <h2>フォーマット結果</h2>
+                <div class="output-container">
+                    <div id="output-loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>処理中...</p>
+                        <button id="cancel-btn" class="btn danger">
+                            <i class="fas fa-times"></i> キャンセル
+                        </button>
+                    </div>
+                    
+                    <div id="output-content">
+                        <div id="output-text"></div>
+                    </div>
+                    
+                    <div class="output-actions">
+                        <div class="output-action-group">
+                            <label for="export-format-select">エクスポート形式:</label>
+                            <select id="export-format-select">
+                                <option value="txt">テキスト (.txt)</option>
+                                <option value="md">Markdown (.md)</option>
+                                <option value="html">HTML (.html)</option>
+                                <option value="json">JSON (.json)</option>
+                            </select>
+                            <button id="export-confirm-btn" class="btn secondary">
+                                <i class="fas fa-download"></i> 決定
+                            </button>
+                        </div>
+                        <div class="output-action-group">
+                             <label for="other-action-select">その他アクション:</label>
+                            <select id="other-action-select">
+                                <option value="">選択...</option>
+                                <option value="copy">コピー</option>
+                                <option value="print">印刷</option>
+                                <option value="share">共有</option>
+                            </select>
+                            <button id="other-action-confirm-btn" class="btn secondary">
+                                <i class="fas fa-check"></i> 決定
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button id="format-btn" class="btn primary">
+                <i class="fas fa-magic"></i> フォーマット実行
+            </button>
+        </div>
+    </main>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel">
+        <div class="settings-panel-header">
+            <h2>設定</h2>
+            <button id="settings-panel-close" class="settings-panel-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="settings-container">
+            <div class="settings-group">
+                <h3>テキスト設定</h3>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="remove-fillers" checked>
+                        フィラーワードを削除
+                    </label>
+                    <span class="tooltip" data-tooltip="「えー」「あー」などのフィラーワードを削除します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="add-timestamps" checked>
+                        タイムスタンプを追加
+                    </label>
+                    <span class="tooltip" data-tooltip="一定間隔でタイムスタンプを追加します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="timestamp-interval">タイムスタンプ間隔（分）:</label>
+                    <input type="number" id="timestamp-interval" min="1" max="60" value="10">
+                    <span class="tooltip" data-tooltip="タイムスタンプを追加する間隔（分）を指定します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="group-by-topic" checked>
+                        話題ごとにグループ化
+                    </label>
+                    <span class="tooltip" data-tooltip="関連する内容をひとまとまりにします">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="add-titles" checked>
+                        話題のタイトルを追加
+                    </label>
+                    <span class="tooltip" data-tooltip="各話題に内容を端的に表すタイトルを追加します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="speaker-format">話者フォーマット:</label>
+                    <input type="text" id="speaker-format" value="{speaker}: {text}">
+                    <span class="tooltip" data-tooltip="話者と発言内容の表示形式を指定します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h3>モデル設定</h3>
+                <div class="setting-item">
+                    <label for="model-select">AIモデル:</label>
+                    <select id="model-select">
+                        <option value="gemini-2.5-pro-exp-03-25" selected>Gemini 2.5 Pro Exp (03-25)</option> <!-- Default experimental -->
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro (Stable - Not Yet Available?)</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                    <span class="tooltip" data-tooltip="使用するAIモデルを選択します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="api-key">API キー:</label>
+                    <input type="password" id="api-key" placeholder="API キーを入力">
+                    <span class="tooltip" data-tooltip="APIキーを入力すると、自分のアカウントでAPIを使用できます">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="temperature">Temperature:</label>
+                    <input type="range" id="temperature" min="0" max="1" step="0.1" value="0">
+                    <span id="temperature-value">0</span>
+                    <span class="tooltip" data-tooltip="値が高いほど創造的な出力になります">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+            </div>
+            
+            <div class="settings-group">
+                <h3>保存設定</h3>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="save-settings" checked>
+                        設定を保存する
+                    </label>
+                    <span class="tooltip" data-tooltip="設定を保存して次回も維持します">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </div>
+                <div class="setting-item">
+                    <button id="clear-settings" class="btn secondary">
+                        <i class="fas fa-trash"></i> 保存した設定をクリア
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Log -->
+    <button id="error-log-toggle" class="error-log-toggle">
+        <i class="fas fa-bug"></i>
+    </button>
+    
+    <div id="error-log" class="error-log">
+        <div class="error-log-header">
+            <h3>エラーログ</h3>
+            <button id="error-log-close" class="error-log-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="error-log-content" class="error-log-content"></div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 会話フォーマッター | <a href="https://github.com/18173kidd/conversation-formatter-improved" target="_blank">GitHub</a></p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script src="js/formatter.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/error-log.js"></script>
+    
+    <!-- Service Worker Registration (Removed) -->
+    <!-- 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+    -->
+</body>
+</html>
